@@ -66,10 +66,10 @@ class User(SQLAlchemyBase, JSONModel):
     password = Column(UnicodeText, nullable=False)
     email = Column(Unicode(255), nullable=False)
     tokens = relationship("UserToken", back_populates="user", cascade="all, delete-orphan")
-    name = Column(Unicode(50), nullable=False)
-    surname = Column(Unicode(50), nullable=False)
+    name = Column(Unicode(50))
+    surname = Column(Unicode(50))
     birthdate = Column(Date)
-    genere = Column(Enum(GenereEnum), nullable=False)
+    genere = Column(Enum(GenereEnum))
     phone = Column(Unicode(50))
     photo = Column(Unicode(255))
 
