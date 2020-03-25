@@ -12,7 +12,7 @@ from urllib.parse import urljoin
 import falcon
 from passlib.hash import pbkdf2_sha256
 from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, Unicode, \
-    UnicodeText
+    UnicodeText, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import relationship
@@ -66,12 +66,16 @@ class User(SQLAlchemyBase, JSONModel):
     password = Column(UnicodeText, nullable=False)
     email = Column(Unicode(255), nullable=False)
     tokens = relationship("UserToken", back_populates="user", cascade="all, delete-orphan")
-    name = Column(Unicode(50))
-    surname = Column(Unicode(50))
+    name = Column(Unicode(50), nullable=False)
+    surname = Column(Unicode(50), nullable=False)
     birthdate = Column(Date)
-    genere = Column(Enum(GenereEnum))
+    genere = Column(Enum(GenereEnum), nullable=False)
     phone = Column(Unicode(50))
     photo = Column(Unicode(255))
+    stars = Column(Float, default=0)
+    favoursDone = Column(Integer, default=0)
+    timesHelped = Column(Integer, default=0)
+    location = Column(Unicode(255))
 
     @hybrid_property
     def public_profile(self):
@@ -80,6 +84,10 @@ class User(SQLAlchemyBase, JSONModel):
             "username": self.username,
             "genere": self.genere.value,
             "photo": self.photo,
+            "stars": self.stars,
+            "favoursDone": self.favoursDone,
+            "timesHelped": self.timesHelped,
+            "location": self.location,
         }
 
     @hybrid_method
@@ -112,4 +120,8 @@ class User(SQLAlchemyBase, JSONModel):
             "genere": self.genere.value,
             "phone": self.phone,
             "photo": self.photo,
+            "stars": self.stars,
+            "favoursDone": self.favoursDone,
+            "timesHelped": self.timesHelped,
+            "location": self.location,
         }
