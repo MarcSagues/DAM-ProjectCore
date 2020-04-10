@@ -125,3 +125,52 @@ class User(SQLAlchemyBase, JSONModel):
             "timesHelped": self.timesHelped,
             "location": self.location,
         }
+
+
+
+class AllFavours(SQLAlchemyBase, JSONModel):
+    __tablename__ = "all_favours"
+
+    icon = Column(Integer, primary_key=True)
+    name = Column(Unicode(50), nullable=False, unique=True)
+    desc = Column(Unicode(50), nullable=False, unique=True)
+    amount = Column(Float, default=0)
+
+
+    @hybrid_property
+    def public_profile(self):
+        return {
+            "created_at": self.created_at.strftime(settings.DATETIME_DEFAULT_FORMAT),
+            "icon": self.icon,
+            "name": self.name,
+            "desc": self.desc,
+            "amount": self.amount,
+        }
+
+    @hybrid_method
+    def set_password(self, password_string):
+        self.password = pbkdf2_sha256.hash(password_string)
+
+    @hybrid_method
+    def check_password(self, password_string):
+        return pbkdf2_sha256.verify(password_string, self.password)
+
+    @hybrid_method
+    def create_token(self):
+        if len(self.tokens) < settings.MAX_USER_TOKENS:
+            token_string = binascii.hexlify(os.urandom(25)).decode("utf-8")
+            aux_token = UserToken(token=token_string, user=self)
+            return aux_token
+        else:
+            raise falcon.HTTPBadRequest(title=messages.quota_exceded, description=messages.maximum_tokens_exceded)
+
+    @hybrid_property
+    def json_model(self):
+        return {
+            "created_at": self.created_at.strftime(settings.DATETIME_DEFAULT_FORMAT),
+            "icon": self.icon,
+            "name": self.name,
+            "desc": self.desc,
+            "amount": self.amount,
+        }
+
