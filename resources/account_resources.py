@@ -8,7 +8,7 @@ import falcon
 from falcon.media.validators import jsonschema
 
 import messages
-from db.models import User, UserToken
+from db.models import User, UserToken, Favour
 from hooks import requires_auth
 from resources.base_resources import DAMCoreResource
 from resources.schemas import SchemaUserToken
@@ -28,6 +28,7 @@ class ResourceCreateUserToken(DAMCoreResource):
                 raise falcon.HTTPUnauthorized(description=messages.username_and_password_required)
         else:
             raise falcon.HTTPUnauthorized(description=messages.authorization_header_required)
+        favour_extra = self.db_session.query(Favour)
 
         current_user = self.db_session.query(User).filter(User.email == auth_username).one_or_none()
         if current_user is None:

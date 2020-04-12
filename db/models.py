@@ -12,7 +12,7 @@ from urllib.parse import urljoin
 import falcon
 from passlib.hash import pbkdf2_sha256
 from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, Unicode, \
-    UnicodeText, Float
+    UnicodeText, Float, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import relationship
@@ -128,23 +128,27 @@ class User(SQLAlchemyBase, JSONModel):
 
 
 
-class AllFavours(SQLAlchemyBase, JSONModel):
-    __tablename__ = "all_favours"
+class Favour(SQLAlchemyBase, JSONModel):
+    __tablename__ = "favours"
 
-    icon = Column(Integer, primary_key=True)
-    name = Column(Unicode(50), nullable=False, unique=True)
-    desc = Column(Unicode(50), nullable=False, unique=True)
-    amount = Column(Float, default=0)
+    id = Column(Integer, primary_key=True)
+    user = Column(Unicode(15), nullable=False)
+    category = Column(Unicode(20), nullable=False)
+    name = Column(Unicode(50), nullable=False)
+    desc = Column(Unicode(600), nullable=False)
+    amount = Column(Float, nullable=True)
 
 
     @hybrid_property
-    def public_profile(self):
+    def getFavour(self):
         return {
-            "created_at": self.created_at.strftime(settings.DATETIME_DEFAULT_FORMAT),
-            "icon": self.icon,
+            "id": self.id,
+            "user": self.user,
+            "category": self.category,
             "name": self.name,
             "desc": self.desc,
             "amount": self.amount,
+
         }
 
     @hybrid_method
@@ -167,8 +171,9 @@ class AllFavours(SQLAlchemyBase, JSONModel):
     @hybrid_property
     def json_model(self):
         return {
-            "created_at": self.created_at.strftime(settings.DATETIME_DEFAULT_FORMAT),
-            "icon": self.icon,
+            "id": self.id,
+            "user": self.user,
+            "category": self.category,
             "name": self.name,
             "desc": self.desc,
             "amount": self.amount,
