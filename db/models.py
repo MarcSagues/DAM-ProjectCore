@@ -12,7 +12,7 @@ from urllib.parse import urljoin
 import falcon
 from passlib.hash import pbkdf2_sha256
 from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, Unicode, \
-    UnicodeText, Float, String
+    UnicodeText, Float, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import relationship
@@ -77,6 +77,10 @@ class User(SQLAlchemyBase, JSONModel):
     timesHelped = Column(Integer, default=0)
     location = Column(Unicode(255))
 
+    events_owner = relationship("Favour", back_populate="owner", cascade="all, delete-orphan")
+
+    events_enrolled = relationship("Favour", back_populate="registered" )
+
     @hybrid_property
     def public_profile(self):
         return {
@@ -127,16 +131,36 @@ class User(SQLAlchemyBase, JSONModel):
         }
 
 
+EventUserAsociation = Table(
+    "event_user_association", SQLAlchemyBase.metadata,
+    Column("event_id", Integer,
+           ForeignKey("favours.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
+    Column("user_id", Integer,
+           ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False))
+
+
+
+
+class EventTypeEnum(enum.Enum):
+    computer = 'C'
+    jardineria = 'J'
+    others = 'O'
+
 
 class Favour(SQLAlchemyBase, JSONModel):
     __tablename__ = "favours"
 
     id = Column(Integer, primary_key=True)
     user = Column(Unicode(15), nullable=False)
-    category = Column(Unicode(20), nullable=False)
+    category = Column(EventTypeEnum)
     name = Column(Unicode(50), nullable=False)
     desc = Column(Unicode(600), nullable=False)
     amount = Column(Float, nullable=True)
+
+    owner_id = Column(Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
+    owner = relationship("User", back_populates="events_enrolled")
+
+    registered = relationship("User", secondary=EventUserAsociation, back_populates="events_enrolled")
 
 
     @hybrid_property
