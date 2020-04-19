@@ -77,9 +77,9 @@ class User(SQLAlchemyBase, JSONModel):
     timesHelped = Column(Integer, default=0)
     location = Column(Unicode(255))
 
-    events_owner = relationship("Favour", back_populate="owner", cascade="all, delete-orphan")
+    events_owner = relationship("Favour", back_populates="owner", cascade="all, delete-orphan")
 
-    events_enrolled = relationship("Favour", back_populate="registered" )
+    events_enrolled = relationship("Favour", back_populates="registered" )
 
     @hybrid_property
     def public_profile(self):
