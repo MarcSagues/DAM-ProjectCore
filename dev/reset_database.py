@@ -92,7 +92,7 @@ if __name__ == "__main__":
     favour1 = Favour(
         id=1,
         user="usuari1",
-        category=EventTypeEnum.computer,
+        category=EventTypeEnum.technology,
         name="Favor1",
         desc="heyyyyyyyyyyyyyy",
         amount=10,

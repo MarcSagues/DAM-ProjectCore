@@ -142,7 +142,7 @@ EventUserAsociation = Table(
 
 
 class EventTypeEnum(enum.Enum):
-    computer = 'C'
+    technology = 'T'
     jardineria = 'J'
     others = 'O'
 
@@ -152,7 +152,7 @@ class Favour(SQLAlchemyBase, JSONModel):
 
     id = Column(Integer, primary_key=True)
     user = Column(Unicode(15), nullable=False)
-    category = Column(EventTypeEnum)
+    category = Column(Enum(EventTypeEnum))
     name = Column(Unicode(50), nullable=False)
     desc = Column(Unicode(600), nullable=False)
     amount = Column(Float, nullable=True)
