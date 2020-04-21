@@ -92,6 +92,7 @@ class ResourcePostFavour(DAMCoreResource):
         aux_events = Favour()
 
         try:
+
             aux_events.user = req.media["username"]
             aux_events.name = req.media["name"]
             aux_events.description = req.media["description"]
