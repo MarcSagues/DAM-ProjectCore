@@ -36,9 +36,14 @@ class ResourceGetEvents(DAMCoreResource):
 #@falcon.before(requires_auth)
 class UpdateFavour(DAMCoreResource):
     #@jsonschema.validate(SchemaUpdateFavour)
-    def on_put(self, req, resp, *args, **kwargs):
+    def on_post(self, req, resp, *args, **kwargs):
         super(UpdateFavour, self).on_post(req, resp, *args, **kwargs)
 
         a = self.db_session.query(Favour)
-
+        print("------------------------------")
+        print(self)
+        print(req)
+        print(args)
+        print(kwargs)
+        self.db_session.add(a)
         self.db_session.commit()
