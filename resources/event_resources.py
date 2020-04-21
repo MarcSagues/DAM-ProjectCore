@@ -66,9 +66,9 @@ class UpdateFavour(DAMCoreResource):
 
 @falcon.before(requires_auth)
 class DeleteFavour(DAMCoreResource):
-    @jsonschema.validate(SchemaUpdateFavour)
-    def on_post(self, req, resp, *args, **kwargs):
-        super(UpdateFavour, self).on_post(req, resp, *args, **kwargs)
+    #@jsonschema.validate(SchemaUpdateFavour)
+    def on_get(self, req, resp, *args, **kwargs):
+        super(DeleteFavour, self).on_get(req, resp, *args, **kwargs)
 
         current_user = req.context["auth_user"]
         #Assegurar que el id del favor correspon al id del usuari
@@ -82,3 +82,30 @@ class DeleteFavour(DAMCoreResource):
 
             except NoResultFound:
                 raise falcon.HTTPBadRequest(description=messages.user_not_found) #TODO
+
+@falcon.before(requires_auth)
+class ResourcePostFavour(DAMCoreResource):
+    #@jsonschema.validate(SchemaRegisterUser)
+    def on_post(self, req, resp, *args, **kwargs):
+        super(ResourcePostFavour, self).on_post(req, resp, *args, **kwargs)
+
+        aux_events = Favour()
+
+        try:
+            aux_events.user = req.media["username"]
+            aux_events.name = req.media["name"]
+            aux_events.description = req.media["description"]
+            aux_events.category = req.media["category"]
+            aux_events.amount = req.media["amount"]
+
+            self.db_session.add(aux_events)
+
+            try:
+                self.db_session.commit()
+            except IntegrityError:
+                raise falcon.HTTPBadRequest(description=messages.user_exists)
+
+        except KeyError:
+            raise falcon.HTTPBadRequest(description=messages.parameters_invalid)
+
+        resp.status = falcon.HTTP_200
