@@ -71,17 +71,10 @@ class DeleteFavour(DAMCoreResource):
         super(DeleteFavour, self).on_get(req, resp, *args, **kwargs)
 
         current_user = req.context["auth_user"]
-        #Assegurar que el id del favor correspon al id del usuari
-
-        if "id" in kwargs:
-            try:
-                favour = self.db_session.query(Favour).delete(Favour.id == kwargs["id"], Favour.owner_id == current_user.id)
-                self.db_session.commit()
-
-                resp.status = falcon.HTTP_200
-
-            except NoResultFound:
-                raise falcon.HTTPBadRequest(description=messages.user_not_found) #TODO
+        print(current_user.id , "CURRENTUSER ID")
+        fav = self.db_session.query(Favour).filter(Favour.id == kwargs["id"], Favour.owner_id == current_user.id).delete()
+        self.db_session.commit()
+        resp.status = falcon.HTTP_200
 
 @falcon.before(requires_auth)
 class ResourcePostFavour(DAMCoreResource):
