@@ -54,10 +54,16 @@ class UpdateFavour(DAMCoreResource):
                 favour = self.db_session.query(Favour).filter(Favour.id == kwargs["id"], Favour.owner_id == current_user.id).one()
                 if (req.media["name"]) is not None:
                     favour.name = req.media["name"]
-                    self.db_session.add(favour)
-                    self.db_session.commit()
+                if (req.media["description"]) is not None:
+                    favour.desc = req.media["description"]
+                if (req.media["category"]) is not None:
+                    favour.category = req.media["category"]
+                if (req.media["amount"]) is not None:
+                    favour.amount = req.media["amount"]
+                self.db_session.add(favour)
+                self.db_session.commit()
 
-                    resp.status = falcon.HTTP_200
+                resp.status = falcon.HTTP_200
 
             except NoResultFound:
                 raise falcon.HTTPBadRequest(description=messages.user_not_found) #TODO
