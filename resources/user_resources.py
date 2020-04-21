@@ -25,7 +25,6 @@ class ResourceGetUserProfile(DAMCoreResource):
         if "username" in kwargs:
             try:
                 aux_user = self.db_session.query(User).filter(User.username == kwargs["username"]).one()
-
                 resp.media = aux_user.public_profile
                 resp.status = falcon.HTTP_200
             except NoResultFound:
@@ -41,8 +40,6 @@ class ResourceRegisterUser(DAMCoreResource):
         aux_user = User()
 
         try:
-
-
             aux_user.username = req.media["username"]
             aux_user.password = req.media["password"]
             aux_user.email = req.media["email"]
@@ -64,9 +61,7 @@ class ResourceGetFavours(DAMCoreResource):
         super(ResourceGetFavours, self).on_get(req, resp, *args, **kwargs)
 
         try:
-
             aux_user = self.db_session.query(Favour)
-
             resp.media = aux_user.getFavour
             resp.status = falcon.HTTP_200
         except NoResultFound:

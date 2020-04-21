@@ -39,5 +39,6 @@ application.add_route("/users/register", user_resources.ResourceRegisterUser())
 application.add_route("/users/show/{username}", user_resources.ResourceGetUserProfile())
 
 application.add_route("/favours", event_resources.ResourceGetEvents())
+application.add_route("/favours/post", event_resources.UpdateFavour())
 
 application.add_sink(handle_404, "")

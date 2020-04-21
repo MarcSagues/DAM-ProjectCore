@@ -12,7 +12,7 @@ import messages
 from db.models import User, GenereEnum, Favour
 from hooks import requires_auth
 from resources.base_resources import DAMCoreResource
-from resources.schemas import SchemaRegisterUser
+from resources.schemas import SchemaRegisterUser, SchemaUpdateFavour
 
 mylogger = logging.getLogger(__name__)
 
@@ -32,3 +32,13 @@ class ResourceGetEvents(DAMCoreResource):
         resp.media = response_events
         resp.status = falcon.HTTP_200
 
+
+#@falcon.before(requires_auth)
+class UpdateFavour(DAMCoreResource):
+    #@jsonschema.validate(SchemaUpdateFavour)
+    def on_put(self, req, resp, *args, **kwargs):
+        super(UpdateFavour, self).on_post(req, resp, *args, **kwargs)
+
+        a = self.db_session.query(Favour)
+
+        self.db_session.commit()
