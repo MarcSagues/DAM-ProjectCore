@@ -75,7 +75,7 @@ class DeleteFavour(DAMCoreResource):
 
         if "id" in kwargs:
             try:
-                favour = self.db_session.query(Favour).delete(Favour.id == kwargs["id"], Favour.owner_id == current_user.id).one()
+                favour = self.db_session.query(Favour).delete(Favour.id == kwargs["id"], Favour.owner_id == current_user.id)
                 self.db_session.commit()
 
                 resp.status = falcon.HTTP_200
@@ -89,22 +89,22 @@ class ResourcePostFavour(DAMCoreResource):
     def on_post(self, req, resp, *args, **kwargs):
         super(ResourcePostFavour, self).on_post(req, resp, *args, **kwargs)
 
-        aux_events = Favour()
-
+        favour = Favour()
+        current_user = req.context["auth_user"]
         try:
-
-            aux_events.user = req.media["username"]
-            aux_events.name = req.media["name"]
-            aux_events.description = req.media["description"]
-            aux_events.category = req.media["category"]
-            aux_events.amount = req.media["amount"]
-
-            self.db_session.add(aux_events)
+            favour.user = req.media["username"]
+            favour.name = req.media["name"]
+            favour.desc = req.media["desc"]
+            favour.category = req.media["category"]
+            favour.amount = req.media["amount"]
+            favour.owner_id = current_user.id
+            favour.registered = [current_user]
+            self.db_session.add(favour)
 
             try:
                 self.db_session.commit()
             except IntegrityError:
-                raise falcon.HTTPBadRequest(description=messages.user_exists)
+                raise falcon.HTTPBadRequest(IntegrityError)
 
         except KeyError:
             raise falcon.HTTPBadRequest(description=messages.parameters_invalid)
