@@ -17,13 +17,20 @@ from resources.schemas import SchemaRegisterUser, SchemaUpdateFavour
 mylogger = logging.getLogger(__name__)
 
 
-#@falcon.before(requires_auth)
+@falcon.before(requires_auth)
 class ResourceGetEvents(DAMCoreResource):
     def on_get(self, req, resp, *args, **kwargs):
         super(ResourceGetEvents, self).on_get(req, resp, *args, **kwargs)
 
+        request_favour_userid = req.get_param("user_id", False)
+        current_user = req.context["auth_user"]
         response_events = list()
-        aux_events = self.db_session.query(Favour)
+
+        #Agafem tots els valors del usuari
+        if request_favour_userid is not None:
+            aux_events = self.db_session.query(Favour).filter(Favour.owner_id == current_user.id)
+        else:
+            aux_events = self.db_session.query(Favour).filter(Favour.owner_id != current_user.id)
 
         if aux_events is not None:
             for current_event in aux_events:
@@ -33,17 +40,24 @@ class ResourceGetEvents(DAMCoreResource):
         resp.status = falcon.HTTP_200
 
 
-#@falcon.before(requires_auth)
+@falcon.before(requires_auth)
 class UpdateFavour(DAMCoreResource):
-    #@jsonschema.validate(SchemaUpdateFavour)
+    @jsonschema.validate(SchemaUpdateFavour)
     def on_post(self, req, resp, *args, **kwargs):
         super(UpdateFavour, self).on_post(req, resp, *args, **kwargs)
 
-        a = self.db_session.query(Favour)
-        print("------------------------------")
-        print(self)
-        print(req)
-        print(args)
-        print(kwargs)
-        self.db_session.add(a)
-        self.db_session.commit()
+        current_user = req.context["auth_user"]
+        #Assegurar que el id del favor correspon al id del usuari
+
+        if "id" in kwargs:
+            try:
+                favour = self.db_session.query(Favour).filter(Favour.id == kwargs["id"], Favour.owner_id == current_user.id).one()
+                if (req.media["name"]) is not None:
+                    favour.name = req.media["name"]
+                    self.db_session.add(favour)
+                    self.db_session.commit()
+
+                    resp.status = falcon.HTTP_200
+
+            except NoResultFound:
+                raise falcon.HTTPBadRequest(description=messages.user_not_found) #TODO

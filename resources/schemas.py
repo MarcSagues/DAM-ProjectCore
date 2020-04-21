@@ -25,7 +25,7 @@ SchemaUpdateFavour = {
         "name": {"type": "string"},
         "description": {"type": "string"},
         "category": {"type": "string"},
-        "amount": {"type": "float"},
+        "amount": {"type": "number"},
     },
-    "required": ["name", "description", "category", "amount"]
+    "required": []
 }
