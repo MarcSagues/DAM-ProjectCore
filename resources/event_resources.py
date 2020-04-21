@@ -61,3 +61,24 @@ class UpdateFavour(DAMCoreResource):
 
             except NoResultFound:
                 raise falcon.HTTPBadRequest(description=messages.user_not_found) #TODO
+
+
+
+@falcon.before(requires_auth)
+class DeleteFavour(DAMCoreResource):
+    @jsonschema.validate(SchemaUpdateFavour)
+    def on_post(self, req, resp, *args, **kwargs):
+        super(UpdateFavour, self).on_post(req, resp, *args, **kwargs)
+
+        current_user = req.context["auth_user"]
+        #Assegurar que el id del favor correspon al id del usuari
+
+        if "id" in kwargs:
+            try:
+                favour = self.db_session.query(Favour).delete(Favour.id == kwargs["id"], Favour.owner_id == current_user.id).one()
+                self.db_session.commit()
+
+                resp.status = falcon.HTTP_200
+
+            except NoResultFound:
+                raise falcon.HTTPBadRequest(description=messages.user_not_found) #TODO
