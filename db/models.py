@@ -142,9 +142,11 @@ EventUserAsociation = Table(
 
 
 class EventTypeEnum(enum.Enum):
-    technology = 'T'
-    jardineria = 'J'
-    others = 'O'
+    favourxfavour = "favourxfavour"
+    daytodaythings = "daytodaythings"
+    computing = "computing"
+    reparation = "reparation"
+    others = "others"
 
 
 class Favour(SQLAlchemyBase, JSONModel):
@@ -152,7 +154,9 @@ class Favour(SQLAlchemyBase, JSONModel):
 
     id = Column(Integer, primary_key=True)
     user = Column(Unicode(15), nullable=False)
-    category = Column(Enum(EventTypeEnum))
+    #Amb enum no funciona
+    #category = Column(Enum(EventTypeEnum), nullable=False)
+    category = Column(Unicode(50), nullable=False)
     name = Column(Unicode(50), nullable=False)
     desc = Column(Unicode(600), nullable=False)
     amount = Column(Float, nullable=True)

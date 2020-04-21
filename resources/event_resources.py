@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
+from builtins import super
 import falcon
 from falcon.media.validators import jsonschema
 from sqlalchemy.exc import IntegrityError
@@ -17,7 +17,7 @@ from resources.schemas import SchemaRegisterUser
 mylogger = logging.getLogger(__name__)
 
 
-@falcon.before(requires_auth)
+#@falcon.before(requires_auth)
 class ResourceGetEvents(DAMCoreResource):
     def on_get(self, req, resp, *args, **kwargs):
         super(ResourceGetEvents, self).on_get(req, resp, *args, **kwargs)
@@ -26,7 +26,7 @@ class ResourceGetEvents(DAMCoreResource):
         aux_events = self.db_session.query(Favour)
 
         if aux_events is not None:
-            for current_event in aux_events.all():
+            for current_event in aux_events:
                 response_events.append(current_event.json_model)
 
         resp.media = response_events

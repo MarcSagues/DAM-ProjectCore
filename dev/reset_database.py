@@ -92,11 +92,31 @@ if __name__ == "__main__":
     favour1 = Favour(
         id=1,
         user="usuari1",
-        category=EventTypeEnum.technology,
+        category=EventTypeEnum.favourxfavour.name,
         name="Favor1",
         desc="heyyyyyyyyyyyyyy",
         amount=10,
-        registered=[user_1 ]
+        registered=[user_1]
+    )
+
+    favour2 = Favour(
+        id=2,
+        user="usuari",
+        category=EventTypeEnum.reparation.name,
+        name="Favor2",
+        desc="Lore ipsum hemini hemono",
+        amount=10,
+        registered=[user_1]
+    )
+
+    favour1 = Favour(
+        id=3,
+        user="usuari2",
+        category=EventTypeEnum.others.name,
+        name="Favor1",
+        desc="Hey this is a example text lelelel",
+        amount=10,
+        registered=[user_2]
     )
 
     db_session.add(favour1)
