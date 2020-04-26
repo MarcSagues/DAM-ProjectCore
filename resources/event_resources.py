@@ -54,10 +54,16 @@ class UpdateFavour(DAMCoreResource):
                 favour = self.db_session.query(Favour).filter(Favour.id == kwargs["id"], Favour.owner_id == current_user.id).one()
                 if (req.media["name"]) is not None:
                     favour.name = req.media["name"]
-                    self.db_session.add(favour)
-                    self.db_session.commit()
+                if (req.media["description"]) is not None:
+                    favour.desc = req.media["description"]
+                if (req.media["category"]) is not None:
+                    favour.category = req.media["category"]
+                if (req.media["amount"]) is not None:
+                    favour.amount = req.media["amount"]
+                self.db_session.add(favour)
+                self.db_session.commit()
 
-                    resp.status = falcon.HTTP_200
+                resp.status = falcon.HTTP_200
 
             except NoResultFound:
                 raise falcon.HTTPBadRequest(description=messages.user_not_found) #TODO
@@ -71,17 +77,10 @@ class DeleteFavour(DAMCoreResource):
         super(DeleteFavour, self).on_get(req, resp, *args, **kwargs)
 
         current_user = req.context["auth_user"]
-        #Assegurar que el id del favor correspon al id del usuari
-
-        if "id" in kwargs:
-            try:
-                favour = self.db_session.query(Favour).delete(Favour.id == kwargs["id"], Favour.owner_id == current_user.id).one()
-                self.db_session.commit()
-
-                resp.status = falcon.HTTP_200
-
-            except NoResultFound:
-                raise falcon.HTTPBadRequest(description=messages.user_not_found) #TODO
+        print(current_user.id , "CURRENTUSER ID")
+        fav = self.db_session.query(Favour).filter(Favour.id == kwargs["id"], Favour.owner_id == current_user.id).delete()
+        self.db_session.commit()
+        resp.status = falcon.HTTP_200
 
 @falcon.before(requires_auth)
 class ResourcePostFavour(DAMCoreResource):
@@ -89,22 +88,22 @@ class ResourcePostFavour(DAMCoreResource):
     def on_post(self, req, resp, *args, **kwargs):
         super(ResourcePostFavour, self).on_post(req, resp, *args, **kwargs)
 
-        aux_events = Favour()
-
+        favour = Favour()
+        current_user = req.context["auth_user"]
         try:
-
-            aux_events.user = req.media["username"]
-            aux_events.name = req.media["name"]
-            aux_events.description = req.media["description"]
-            aux_events.category = req.media["category"]
-            aux_events.amount = req.media["amount"]
-
-            self.db_session.add(aux_events)
+            favour.user = req.media["username"]
+            favour.name = req.media["name"]
+            favour.desc = req.media["desc"]
+            favour.category = req.media["category"]
+            favour.amount = req.media["amount"]
+            favour.owner_id = current_user.id
+            favour.registered = [current_user]
+            self.db_session.add(favour)
 
             try:
                 self.db_session.commit()
             except IntegrityError:
-                raise falcon.HTTPBadRequest(description=messages.user_exists)
+                raise falcon.HTTPBadRequest(IntegrityError)
 
         except KeyError:
             raise falcon.HTTPBadRequest(description=messages.parameters_invalid)

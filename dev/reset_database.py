@@ -90,7 +90,6 @@ if __name__ == "__main__":
 
     # -------------------- CREATE EVENTS --------------------
     favour1 = Favour(
-        id=1,
         user="usuari1",
         category=EventTypeEnum.favourxfavour.name,
         name="Favor1",
@@ -100,7 +99,6 @@ if __name__ == "__main__":
     )
 
     favour2 = Favour(
-        id=2,
         user="usuari",
         category=EventTypeEnum.reparation.name,
         name="Favor2",
@@ -108,9 +106,7 @@ if __name__ == "__main__":
         amount=10,
         registered=[user_1]
     )
-
     favour1 = Favour(
-        id=3,
         user="usuari2",
         category=EventTypeEnum.others.name,
         name="Favor1",
