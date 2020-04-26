@@ -171,6 +171,7 @@ class Favour(SQLAlchemyBase, JSONModel):
     def getFavour(self):
         return {
             "id": self.id,
+            "owner_id": self.owner_id,
             "user": self.user,
             "category": self.category,
             "name": self.name,
