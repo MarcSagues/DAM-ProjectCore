@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 import messages
-from db.models import User, GenereEnum, Favour
+from db.models import User, GenereEnum, Favour, UserToken
 from hooks import requires_auth
 from resources.base_resources import DAMCoreResource
 from resources.schemas import SchemaRegisterUser
@@ -67,5 +67,15 @@ class ResourceGetFavours(DAMCoreResource):
             raise falcon.HTTPBadRequest(description=messages.user_not_found)
 
 
+@falcon.before(requires_auth)
+class ResourceLogOut(DAMCoreResource):
+    def on_get(self, req, resp, *args, **kwargs):
+        super(ResourceLogOut, self).on_get(req, resp, *args, **kwargs)
 
-
+        current_user = req.context["auth_user"]
+        try:
+            todelete = self.db_session.query(UserToken).filter(UserToken.user_id == current_user.id).delete()
+            self.db_session.commit()
+            resp.status = falcon.HTTP_200
+        except NoResultFound:
+            raise falcon.HTTPBadRequest(description=messages.user_not_found)
