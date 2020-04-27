@@ -203,6 +203,7 @@ class Favour(SQLAlchemyBase, JSONModel):
     def json_model(self):
         return {
             "id": self.id,
+			 "owner_id": self.owner_id,
             "user": self.user,
             "category": self.category,
             "name": self.name,
