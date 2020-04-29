@@ -54,8 +54,8 @@ class UpdateFavour(DAMCoreResource):
                 favour = self.db_session.query(Favour).filter(Favour.id == kwargs["id"], Favour.owner_id == current_user.id).one()
                 if (req.media["name"]) is not None:
                     favour.name = req.media["name"]
-                if (req.media["description"]) is not None:
-                    favour.desc = req.media["description"]
+                if (req.media["desc"]) is not None:
+                    favour.desc = req.media["desc"]
                 if (req.media["category"]) is not None:
                     favour.category = req.media["category"]
                 if (req.media["amount"]) is not None:
