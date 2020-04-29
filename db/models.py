@@ -7,6 +7,7 @@ import enum
 import logging
 import os
 from builtins import getattr
+from tokenize import Double
 from urllib.parse import urljoin
 
 import falcon
@@ -76,6 +77,9 @@ class User(SQLAlchemyBase, JSONModel):
     favoursDone = Column(Integer, default=0)
     timesHelped = Column(Integer, default=0)
     location = Column(Unicode(255))
+    longitud = Column(Float, nullable=True)
+    latitud = Column(Float, nullable=True)
+
 
     events_owner = relationship("Favour", back_populates="owner", cascade="all, delete-orphan")
 
@@ -93,6 +97,9 @@ class User(SQLAlchemyBase, JSONModel):
             "favoursDone": self.favoursDone,
             "timesHelped": self.timesHelped,
             "location": self.location,
+            "longitud": self.longitud,
+            "latitud": self.latitud,
+
         }
 
     @hybrid_method
@@ -163,6 +170,7 @@ class Favour(SQLAlchemyBase, JSONModel):
     desc = Column(Unicode(600), nullable=False)
     amount = Column(Float, nullable=True)
 
+
     owner_id = Column(Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
     owner = relationship("User", back_populates="events_enrolled")
 
@@ -179,6 +187,7 @@ class Favour(SQLAlchemyBase, JSONModel):
             "name": self.name,
             "desc": self.desc,
             "amount": self.amount,
+
 
         }
 

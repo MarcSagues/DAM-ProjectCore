@@ -96,6 +96,8 @@ class ResourcePostFavour(DAMCoreResource):
             favour.desc = req.media["desc"]
             favour.category = req.media["category"]
             favour.amount = req.media["amount"]
+            favour.longitud = req.media["longitud"]
+            favour.latitud = req.media["latitud"]
             favour.owner_id = current_user.id
             favour.registered = [current_user]
             self.db_session.add(favour)
