@@ -28,7 +28,7 @@ class ResourceGetEvents(DAMCoreResource):
 
         #Agafem tots els valors del usuari
         if request_favour_userid is not None:
-            aux_events = self.db_session.query(Favour).filter(Favour.owner_id == current_user.id)
+            aux_events = self.db_session.query(Favour).filter(Favour.owner_id == request_favour_userid)
         else:
             aux_events = self.db_session.query(Favour).filter(Favour.owner_id != current_user.id)
 

@@ -99,7 +99,7 @@ if __name__ == "__main__":
     )
 
     favour2 = Favour(
-        user="usuari",
+        user="usuari1",
         category=EventTypeEnum.reparation.name,
         name="Favor2",
         desc="Lore ipsum hemini hemono",
