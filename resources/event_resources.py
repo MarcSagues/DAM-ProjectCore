@@ -60,6 +60,8 @@ class UpdateFavour(DAMCoreResource):
                     favour.category = req.media["category"]
                 if (req.media["amount"]) is not None:
                     favour.amount = req.media["amount"]
+                if (req.media["username"]) is not None:
+                    favour.user = req.media["username"]
                 self.db_session.add(favour)
                 self.db_session.commit()
 
