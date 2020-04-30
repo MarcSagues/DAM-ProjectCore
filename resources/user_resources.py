@@ -89,21 +89,19 @@ class UpdateUser(DAMCoreResource):
         current_user = req.context["auth_user"]
         #Assegurar que el id del favor correspon al id del usuari
 
-        if "id" in kwargs:
-            try:
-                favour = self.db_session.query(User).filter(UserToken.user_id == current_user.id).one()
-                if (req.media["username"]) is not None:
-                    current_user.user = req.media["username"]
-                if (req.media["email"]) is not None:
-                    current_user.email = req.media["email"]
-                if (req.media["phone"]) is not None:
-                    current_user.phone = req.media["phone"]
-                if (req.media["password"]) is not None:
-                    current_user.password = req.media["password"]
-                self.db_session.add(favour)
-                self.db_session.commit()
+        try:
+            if (req.media["username"]) is not None:
+                current_user.username = req.media["username"]
+            if (req.media["email"]) is not None:
+                current_user.email = req.media["email"]
+            if (req.media["phone"]) is not None:
+                current_user.phone = req.media["phone"]
+            if (req.media["password"]) is not None:
+                current_user.password = req.media["password"]
+            self.db_session.add(current_user)
+            self.db_session.commit()
 
-                resp.status = falcon.HTTP_200
+            resp.status = falcon.HTTP_200
 
-            except NoResultFound:
-                raise falcon.HTTPBadRequest(description=messages.user_not_found) #TODO
+        except NoResultFound:
+            raise falcon.HTTPBadRequest(description=messages.user_not_found)  # TODO

@@ -46,6 +46,6 @@ application.add_route("/favours", event_resources.ResourceGetEvents())
 application.add_route("/favours/update/{id}", event_resources.UpdateFavour())
 application.add_route("/favours/delete/{id}", event_resources.DeleteFavour())
 application.add_route("/favours/post/{id}", event_resources.ResourcePostFavour())
-
+application.add_route("/account/update_profile", user_resources.UpdateUser())
 
 application.add_sink(handle_404, "")
