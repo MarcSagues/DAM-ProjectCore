@@ -29,3 +29,14 @@ SchemaUpdateFavour = {
     },
     "required": []
 }
+
+SchemaUpdateUser = {
+    "type": "object",
+    "properties": {
+        "username": {"type": "string"},
+        "password": {"type": "string"},
+        "email": {"type": "string"},
+        "phone": {"type": "string"},
+    },
+    "required": ["username", "password", "email", "phone"]
+}
