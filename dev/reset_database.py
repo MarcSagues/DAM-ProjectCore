@@ -9,7 +9,7 @@ from sqlalchemy.sql import text
 
 import db
 import settings
-from db.models import SQLAlchemyBase, User, GenereEnum, UserToken, Favour, EventTypeEnum
+from db.models import SQLAlchemyBase, User, GenereEnum, UserToken, Favour, EventTypeEnum, Opinion
 from settings import DEFAULT_LANGUAGE
 
 # LOGGING
@@ -86,16 +86,18 @@ if __name__ == "__main__":
     db_session.add(user_admin)
     db_session.add(user_1)
     db_session.add(user_2)
-
+    db_session.commit()
 
     # -------------------- CREATE EVENTS --------------------
+    mylogger.info("Creating default favours...")
     favour1 = Favour(
         user="usuari1",
         category=EventTypeEnum.favourxfavour.name,
         name="Favor1",
         desc="heyyyyyyyyyyyyyy",
         amount=10,
-        registered=[user_1]
+        selected_id=1,
+        owner_id = 2
     )
 
     favour2 = Favour(
@@ -104,17 +106,54 @@ if __name__ == "__main__":
         name="Favor2",
         desc="Lore ipsum hemini hemono",
         amount=10,
-        registered=[user_1]
+        owner_id = 2,
+        selected_id=1,
     )
-    favour1 = Favour(
+    favour3 = Favour(
         user="usuari2",
         category=EventTypeEnum.others.name,
         name="Favor1",
         desc="Hey this is a example text lelelel",
         amount=10,
-        registered=[user_2]
+        owner_id = 2,
+        selected_id = 1
     )
 
     db_session.add(favour1)
+    db_session.add(favour2)
+    db_session.add(favour3)
     db_session.commit()
+
+    # -------------------- CREATE OPINIONS --------------------
+    mylogger.info("Creating default opinions...")
+
+    opinion_1 = Opinion(
+
+        description="Esto es un prueba de opinión 1 ",
+        mark=3,
+        avaluator_id = 1,
+        user_id = 2
+    )
+
+    opinion_2 = Opinion(
+        description="Esto es un prueba de opinión 2",
+        mark=5,
+        avaluator_id=1,
+        user_id=3
+    )
+
+    opinion_3 = Opinion(
+        description="Esto es un prueba de opinión 3",
+        mark=2,
+        avaluator_id=2,
+        user_id=3
+    )
+
+    db_session.add(opinion_1)
+    db_session.add(opinion_2)
+    db_session.add(opinion_3)
+    db_session.commit()
+
+
+
     db_session.close()
