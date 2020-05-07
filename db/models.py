@@ -48,6 +48,24 @@ class GenereEnum(enum.Enum):
     male = "M"
     female = "F"
 
+class FavourStatusEnum(enum.Enum):
+    pending = "P"
+    reserved = "R"
+    completed = "C"
+
+
+class Opinion(SQLAlchemyBase, JSONModel):
+    __tablename__ = "opinions"
+
+    avaluator_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
+
+    description = Column(UnicodeText, nullable=True)
+    mark = Column(Float, default=0, nullable=False)
+
+    avaluation = relationship("User", foreign_keys=([avaluator_id]))
+    opinion = relationship("User", foreign_keys=([user_id]))
+
 
 class UserToken(SQLAlchemyBase):
     __tablename__ = "users_tokens"
@@ -80,10 +98,14 @@ class User(SQLAlchemyBase, JSONModel):
     longitud = Column(Float, nullable=True)
     latitud = Column(Float, nullable=True)
 
+    #opinions = relationship("Opinion", back_populates="avaluation")
+    #avaluations = relationship("Opinion", back_populates="opinion")
 
-    events_owner = relationship("Favour", back_populates="owner", cascade="all, delete-orphan")
+    # Ownership
+    favours_owner = relationship("Favour", back_populates="owner", foreign_keys='Favour.owner_id', cascade="all, delete-orphan")
+    favours = relationship("Favour", back_populates="selected_user", foreign_keys='Favour.selected_id')
 
-    events_enrolled = relationship("Favour", back_populates="registered" )
+
 
     @hybrid_property
     def public_profile(self):
@@ -169,12 +191,17 @@ class Favour(SQLAlchemyBase, JSONModel):
     name = Column(Unicode(50), nullable=False)
     desc = Column(Unicode(600), nullable=False)
     amount = Column(Float, nullable=True)
+    # TODO: status calcular de forma dinàmica
 
 
     owner_id = Column(Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
-    owner = relationship("User", back_populates="events_enrolled")
+    owner = relationship("User", back_populates="favours_owner", foreign_keys=([owner_id]))
 
-    registered = relationship("User", secondary=EventUserAsociation, back_populates="events_enrolled")
+    selected_id = Column(Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
+    selected_user = relationship("User",back_populates="favours", foreign_keys=([selected_id]))
+
+    # Usuaris registrat al favor
+    #registered = relationship("User", secondary=EventUserAsociation, back_populates="events_enrolled")
 
 
     @hybrid_property
