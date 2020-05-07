@@ -60,8 +60,9 @@ class UpdateFavour(DAMCoreResource):
                     favour.category = req.media["category"]
                 if (req.media["amount"]) is not None:
                     favour.amount = req.media["amount"]
-                if (req.media["username"]) is not None:
-                    favour.user = req.media["username"]
+                # El username no té sentit modificar-ho:
+                # if (req.media["username"]) is not None:
+                #    favour.user = req.media["username"]
                 self.db_session.add(favour)
                 self.db_session.commit()
 
@@ -93,13 +94,17 @@ class ResourcePostFavour(DAMCoreResource):
         favour = Favour()
         current_user = req.context["auth_user"]
         try:
+            # Que representa la columna user? Per que ho necessiteu?
             favour.user = req.media["username"]
             favour.name = req.media["name"]
+            # Si no es posa en blanc
+            favour.user = current_user.username
             favour.desc = req.media["desc"]
             favour.category = req.media["category"]
             favour.amount = req.media["amount"]
-            favour.longitud = req.media["longitud"]
-            favour.latitud = req.media["latitud"]
+            # Primer heu d'obtenir i passar per Android si no us falla
+            # favour.longitud = req.media["longitud"]
+            # favour.latitud = req.media["latitud"]
             favour.owner_id = current_user.id
             favour.registered = [current_user]
             self.db_session.add(favour)
