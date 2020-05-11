@@ -6,14 +6,16 @@ import datetime
 import enum
 import logging
 import os
+from _operator import and_
 from builtins import getattr
 from tokenize import Double
 from urllib.parse import urljoin
 
+
 import falcon
 from passlib.hash import pbkdf2_sha256
 from sqlalchemy import Column, Date, DateTime, Enum, ForeignKey, Integer, Unicode, \
-    UnicodeText, Float, String, Table
+    UnicodeText, Float, type_coerce, case, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property
 from sqlalchemy.orm import relationship
@@ -191,7 +193,6 @@ class Favour(SQLAlchemyBase, JSONModel):
     name = Column(Unicode(50), nullable=False)
     desc = Column(Unicode(600), nullable=False)
     amount = Column(Float, nullable=True)
-    # TODO: status calcular de forma dinàmica
 
 
     owner_id = Column(Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
@@ -203,6 +204,20 @@ class Favour(SQLAlchemyBase, JSONModel):
     # Usuaris registrat al favor
     #registered = relationship("User", secondary=EventUserAsociation, back_populates="events_enrolled")
 
+    @hybrid_property
+    def status(self):
+        if self.category == "favourxfavour":
+            return EventTypeEnum.favourxfavour
+        elif self.category == "daytodaythings":
+            return EventTypeEnum.computing
+        elif self.category == "computing":
+            return EventTypeEnum.daytodaythings
+        elif self.category == "reparations":
+            return EventTypeEnum.reparation
+        else:
+            return EventTypeEnum.others
+
+
 
     @hybrid_property
     def getFavour(self):
@@ -210,12 +225,10 @@ class Favour(SQLAlchemyBase, JSONModel):
             "id": self.id,
             "owner_id": self.owner_id,
             "user": self.user,
-            "category": self.category,
+            "category": self.status,
             "name": self.name,
             "desc": self.desc,
             "amount": self.amount,
-
-
         }
 
     @hybrid_method
@@ -241,7 +254,7 @@ class Favour(SQLAlchemyBase, JSONModel):
             "id": self.id,
 			 "owner_id": self.owner_id,
             "user": self.user,
-            "category": self.category,
+            "category": self.status,
             "name": self.name,
             "desc": self.desc,
             "amount": self.amount,

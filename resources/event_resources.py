@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 import messages
-from db.models import User, GenereEnum, Favour
+from db.models import User, GenereEnum, Favour, EventTypeEnum
 from hooks import requires_auth
 from resources.base_resources import DAMCoreResource
 from resources.schemas import SchemaRegisterUser, SchemaUpdateFavour
@@ -24,13 +24,20 @@ class ResourceGetEvents(DAMCoreResource):
 
         request_favour_userid = req.get_param("user_id", False)
         current_user = req.context["auth_user"]
+        request_event_status = req.get_param("category", False)
         response_events = list()
 
         #Agafem tots els valors del usuari
         if request_favour_userid is not None:
             aux_events = self.db_session.query(Favour).filter(Favour.owner_id == request_favour_userid)
+
         else:
             aux_events = self.db_session.query(Favour).filter(Favour.owner_id != current_user.id)
+
+        if request_event_status is not None:
+            aux_events = \
+            aux_events.filter(
+            Favour.status == EventTypeEnum(request_event_status))
 
         if aux_events is not None:
             for current_event in aux_events:
