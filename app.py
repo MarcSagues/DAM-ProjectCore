@@ -49,3 +49,5 @@ application.add_route("/favours/add/", event_resources.ResourcePostFavour())
 application.add_route("/account/update_profile", user_resources.UpdateUser())
 
 application.add_sink(handle_404, "")
+
+application.add_route("/opinions/{user_id}/add", user_resources.AddOpinion())

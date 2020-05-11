@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from operator import and_
 
 import falcon
 from falcon.media.validators import jsonschema
@@ -9,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 import messages
-from db.models import User, GenereEnum, Favour, UserToken
+from db.models import User, GenereEnum, Favour, UserToken, Opinion
 from hooks import requires_auth
 from resources.base_resources import DAMCoreResource
 from resources.schemas import SchemaRegisterUser, SchemaUpdateUser
@@ -105,3 +106,37 @@ class UpdateUser(DAMCoreResource):
 
         except NoResultFound:
             raise falcon.HTTPBadRequest(description=messages.user_not_found)  # TODO
+
+@falcon.before(requires_auth)
+class AddOpinion(DAMCoreResource):
+   ## @jsonschema.validate(SchemaUpdateFavour)
+    def on_post(self, req, resp, *args, **kwargs):
+        super(AddOpinion, self).on_post(req, resp, *args, **kwargs)
+
+        current_user = req.context["auth_user"]
+        # Assegurar que el id del favor correspon al id del usuari
+
+        if "user_id" in kwargs:
+            try:
+                print(kwargs["user_id"])
+                favour = self.db_session.query(Favour).filter(and_( Favour.owner_id == current_user.id, Favour.selected_id == kwargs["user_id"])).all()
+                print(favour)
+                if favour:
+                    opinion = Opinion()
+                    if (req.media["description"]) is not None:
+                        opinion.description = req.media["description"]
+                    if (req.media["mark"]) is not None:
+                        opinion.mark = req.media["mark"]
+                    opinion.avaluator_id = current_user.id
+                    opinion.user_id =  kwargs["user_id"]
+                    self.db_session.add(opinion)
+                    self.db_session.commit()
+                else:
+                    raise falcon.HTTPBadRequest(description="Este usuario no ha hecho ningun favor")  # TODO
+
+
+                resp.status = falcon.HTTP_200
+
+            except NoResultFound:
+                raise falcon.HTTPBadRequest(description=messages.user_not_found)  # TODO
+
