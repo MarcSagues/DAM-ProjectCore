@@ -181,18 +181,23 @@ class EventTypeEnum(enum.Enum):
     reparation = "reparation"
     others = "others"
 
+class FavourTypeEnum(enum.Enum):
+    ofereixo = "ofereixo"
+    necessito = "necessito"
+
 
 class Favour(SQLAlchemyBase, JSONModel):
     __tablename__ = "favours"
 
     id = Column(Integer, primary_key=True)
     user = Column(Unicode(15), nullable=False)
-    #Amb enum no funciona
-    #category = Column(Enum(EventTypeEnum), nullable=False)
-    category = Column(Unicode(50), nullable=False)
+    category = Column(Enum(EventTypeEnum), nullable=False)
+    type = Column(Enum(FavourTypeEnum), nullable=False)
     name = Column(Unicode(50), nullable=False)
     desc = Column(Unicode(600), nullable=False)
     amount = Column(Float, nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
 
 
     owner_id = Column(Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=False)
@@ -201,23 +206,6 @@ class Favour(SQLAlchemyBase, JSONModel):
     selected_id = Column(Integer, ForeignKey("users.id", onupdate="CASCADE", ondelete="CASCADE"), nullable=True)
     selected_user = relationship("User",back_populates="favours", foreign_keys=([selected_id]))
 
-    # Usuaris registrat al favor
-    #registered = relationship("User", secondary=EventUserAsociation, back_populates="events_enrolled")
-
-    @hybrid_property
-    def status(self):
-        if self.category == "favourxfavour":
-            return EventTypeEnum.favourxfavour
-        elif self.category == "daytodaythings":
-            return EventTypeEnum.computing
-        elif self.category == "computing":
-            return EventTypeEnum.daytodaythings
-        elif self.category == "reparations":
-            return EventTypeEnum.reparation
-        else:
-            return EventTypeEnum.others
-
-
 
     @hybrid_property
     def getFavour(self):
@@ -225,10 +213,11 @@ class Favour(SQLAlchemyBase, JSONModel):
             "id": self.id,
             "owner_id": self.owner_id,
             "user": self.user,
-            "category": self.status,
+            "category": self.category.value,
             "name": self.name,
             "desc": self.desc,
             "amount": self.amount,
+            "type":self.type.value
         }
 
     @hybrid_method
@@ -254,9 +243,12 @@ class Favour(SQLAlchemyBase, JSONModel):
             "id": self.id,
 			 "owner_id": self.owner_id,
             "user": self.user,
-            "category": self.status,
+            "category": self.category.value,
             "name": self.name,
             "desc": self.desc,
             "amount": self.amount,
+            "type": self.type.value,
+            "latitude": self.latitude,
+            "longitude":self.longitude
         }
 

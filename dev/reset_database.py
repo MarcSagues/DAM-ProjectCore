@@ -4,12 +4,13 @@
 import datetime
 import logging
 import os
+import random
 
 from sqlalchemy.sql import text
 
 import db
 import settings
-from db.models import SQLAlchemyBase, User, GenereEnum, UserToken, Favour, EventTypeEnum, Opinion
+from db.models import SQLAlchemyBase, User, GenereEnum, UserToken, Favour, EventTypeEnum, Opinion, FavourTypeEnum
 from settings import DEFAULT_LANGUAGE
 
 # LOGGING
@@ -88,35 +89,77 @@ if __name__ == "__main__":
     db_session.add(user_2)
     db_session.commit()
 
-    # -------------------- CREATE EVENTS --------------------
+    # -------------------- CREATE FAVOURS --------------------
     mylogger.info("Creating default favours...")
+
+
+    tags = ["Necessito ajuda en ", "Ofereixo ajuda en "]
+    tasks = ["jardineria", "informatica", "cuina", "montar mobles", "llimpiar el pis"]
+    amount = [5,10,15,20,25,30,35,30,50]
+    start_lat = 41.000000
+    stop_lat = 42.000000
+    start_lon = 1.20000
+    stop_lon = 2.200000
+
+
+
+    for i in range (32):
+        type = random.choice(list(FavourTypeEnum))
+        if type == FavourTypeEnum.necessito:
+            name = tags[0] + random.choice(list(tasks))
+        else:
+            name = tags[1] + random.choice(list(tasks))
+
+        favour = Favour(
+            user="usuari1",
+            category=random.choice(list(EventTypeEnum)),
+            type=type,
+            name = name,
+            desc="Lore ipsum hemini hemono",
+            amount=random.choice(list(amount)),
+            owner_id=3,
+            latitude= random.uniform(start_lat, stop_lat),
+            longitude = random.uniform(start_lon, stop_lon)
+        )
+        db_session.add(favour)
+    db_session.commit()
+
     favour1 = Favour(
         user="usuari1",
-        category=EventTypeEnum.favourxfavour.name,
+        category=EventTypeEnum.favourxfavour,
         name="Favor1",
         desc="heyyyyyyyyyyyyyy",
         amount=10,
+        type=FavourTypeEnum.necessito,
         selected_id=1,
-        owner_id = 2
+        owner_id=2,
+        latitude=random.uniform(start_lat, stop_lat),
+        longitude=random.uniform(start_lon, stop_lon)
     )
 
     favour2 = Favour(
         user="usuari1",
-        category=EventTypeEnum.reparation.name,
+        category=EventTypeEnum.reparation,
         name="Favor2",
         desc="Lore ipsum hemini hemono",
         amount=10,
-        owner_id = 2,
+        type=FavourTypeEnum.necessito,
+        owner_id=3,
         selected_id=1,
+        latitude=random.uniform(start_lat, stop_lat),
+        longitude=random.uniform(start_lon, stop_lon)
     )
     favour3 = Favour(
         user="usuari2",
-        category=EventTypeEnum.others.name,
+        category=EventTypeEnum.others,
         name="Favor1",
         desc="Hey this is a example text lelelel",
         amount=10,
-        owner_id = 2,
-        selected_id = 1
+        type=FavourTypeEnum.necessito,
+        owner_id=3,
+        selected_id=1,
+        latitude=random.uniform(start_lat, stop_lat),
+        longitude=random.uniform(start_lon, stop_lon)
     )
 
     db_session.add(favour1)
