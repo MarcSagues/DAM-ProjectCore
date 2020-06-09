@@ -81,9 +81,11 @@ class UpdateFavour(DAMCoreResource):
         current_user = req.context["auth_user"]
         #Assegurar que el id del favor correspon al id del usuari
 
+        print(kwargs)
         if "id" in kwargs:
             try:
                 favour = self.db_session.query(Favour).filter(Favour.id == kwargs["id"], Favour.owner_id == current_user.id).one()
+                print(req.media)
                 if (req.media["name"]) is not None:
                     favour.name = req.media["name"]
                 if (req.media["desc"]) is not None:
@@ -127,10 +129,9 @@ class ResourcePostFavour(DAMCoreResource):
         current_user = req.context["auth_user"]
         try:
             # Que representa la columna user? Per que ho necessiteu?
-            favour.user = req.media["username"]
+            favour.user = current_user.username
             favour.name = req.media["name"]
             # Si no es posa en blanc
-            favour.user = current_user.username
             favour.desc = req.media["desc"]
             favour.category = req.media["category"]
             favour.amount = req.media["amount"]
@@ -138,7 +139,7 @@ class ResourcePostFavour(DAMCoreResource):
             # favour.longitud = req.media["longitud"]
             # favour.latitud = req.media["latitud"]
             favour.owner_id = current_user.id
-            favour.registered = [current_user]
+            #favour.registered = [current_user]
             self.db_session.add(favour)
 
             try:

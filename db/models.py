@@ -192,7 +192,7 @@ class Favour(SQLAlchemyBase, JSONModel):
     id = Column(Integer, primary_key=True)
     user = Column(Unicode(15), nullable=False)
     category = Column(Enum(EventTypeEnum), nullable=False)
-    type = Column(Enum(FavourTypeEnum), nullable=False)
+    type = Column(Enum(FavourTypeEnum), nullable=True)
     name = Column(Unicode(50), nullable=False)
     desc = Column(Unicode(600), nullable=False)
     amount = Column(Float, nullable=True)
